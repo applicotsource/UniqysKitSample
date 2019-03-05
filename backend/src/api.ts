@@ -8,22 +8,16 @@ const memcached = new Memcached(`${DB_HOST}:${DB_PORT}`)
 
 const router = Router()
 
-router.get('/message', async (_, res) => {
-  const count = await getCount()
-  const messages = await getMessages(count)
-  memcached.get('message', (err, data) => {
-    if (err) {
-      res.status(400).send(err)
-    }
-    else {
-      console.log(data)
-      res.send({ message: data });
-    }
-  })
-});
+interface Message {
+  id: number
+  sender: string
+  contents: string
+  timestamp: string
+  blockhash: string
+}
 
-async function getMessages (count: number): Promise<any> {
-  new Promise<{ id: number, sender: string, contents: string }[]>((resolve, reject) => {
+async function getMessages (count: number): Promise<Message[]> {
+  return new Promise((resolve, reject) => {
     if (!count) return resolve([])
     const ids = new Array(count).fill(0).map((_, i) => i + 1) // XXX: fill(0)いる？
     memcached.getMulti(ids.map(id => `messages:${id}`), (err, results) => {
@@ -56,16 +50,21 @@ async function incrCount (): Promise<number> {
   })
 }
 
+router.get('/message', async (_, res) => {
+  const count = await getCount()
+  const messages = await getMessages(count)
+  res.send({ messages });
+});
+
 router.post('/message', async (req, res) => {
   const sender = req.header('uniqys-sender')
   const timestamp = req.header('uniqys-timestamp')
   const blockhash = req.header('uniqys-blockhash')
-  console.log(`sender ${sender}`)
-  const { message } = req.body
+  const { contents } = req.body
 
   const count = await incrCount()
 
-  memcached.set(`message:${count}`, message, 0, async (err) => {
+  memcached.set(`messages:${count}`, { sender, timestamp, blockhash, contents }, 0, (err) => {
     if (err) {
       res.status(400).send(err)
     }

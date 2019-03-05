@@ -2,7 +2,10 @@
   <div>
     <input type="text" v-model="inputMessage">
     <button @click="submit()">submit</button>
-    <div> {{ message }}</div>
+    <p v-for="message in messages" :key="message.id">
+      {{ message.sender }}「{{ message.contents }}」<br>
+      <small>{{ message.timestamp }} {{ message.blockhash }}</small>
+    </p>
   </div>
 </template>
 
@@ -10,10 +13,18 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 
+interface Message {
+  id: number
+  sender: string
+  contents: string
+  timestamp: string
+  blockhash: string
+}
+
 @Component({
 })
 export default class Home extends Vue {
-  public message: string = "";
+  public messages: Message[] = [];
   public inputMessage: string = "";
   public client!: EasyClientForBrowser;
   async mounted() {
@@ -23,13 +34,13 @@ export default class Home extends Vue {
   }
   async update() {
     const { data } = await this.client.get('/api/message');
-    const { message } = data;
-    this.message = `message: ${message}`
+    const { messages } = data as { messages: Message[] };
+    this.messages = messages
   }
   async submit() {
     await this.client.post(
       '/api/message',
-      { message: this.inputMessage },
+      { contents: this.inputMessage },
       { sign: true })
     await this.update()
   }
