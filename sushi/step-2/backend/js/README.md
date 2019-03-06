@@ -319,7 +319,7 @@ async buy(sushi) {
 ```
 
 backend
-```
+```js
 app.post('/api/buy', async (req, res) => {
   const sender = req.header('uniqys-sender')
   const { sushi } = req.body
@@ -344,12 +344,25 @@ app.post('/api/buy', async (req, res) => {
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
-
+# 追加課題
+- にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう
+- Gariがなくてもにぎったり購入したりができてしまいます。できないようにしてみましょう
+- 他の人のおすしも販売できてしまいます。backendを修正してみましょう
+- 売ってないおすしも、自分のおすしも買えてしまいます。backendを修正してみましょう
+- 一回販売すると、キャンセルすることができません。キャンセルできるようにしてみましょう
 
 # 他
 ## データをけしたい
-```
+```sh
 cd backend
 rm -rf .data
 uniqys init ./dapp.json
 ```
+
+## Error: dialed to the wrong peer, Ids do not match
+何回か
+```
+Ctrl-c
+uniqys start
+```
+を試してみてください
