@@ -160,6 +160,7 @@ import { EasyClientForBrowser } from '@uniqys/easy-client'
 dataを修正 デフォルトはなにもなし
 ```
 client: new EasyClientForBrowser('http://localhost:3000'),
+myGari: 0,
 myAddress: '',
 sushiList: []
 ```

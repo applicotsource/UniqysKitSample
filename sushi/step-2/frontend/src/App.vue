@@ -86,7 +86,7 @@ export default {
   data() {
     return {
       client: new EasyClientForBrowser('http://localhost:3000'),
-      myGari: 10000,
+      myGari: 0,
       myAddress: '',
       price: [],
       sushiList: []
