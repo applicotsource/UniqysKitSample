@@ -37,7 +37,7 @@ data() {
       <p>{{ sushi.owner }}</p>
       <p>{{ sushi.dna }}</p>
     </div>
-    ```
+```
 
 styleを当ててみる
 ```
