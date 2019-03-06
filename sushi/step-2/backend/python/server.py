@@ -1,8 +1,8 @@
 import json
-from bottle import route, run, request, response, static_file, hook
-from pymemcache.client import Client
 import hashlib
 import requests
+from bottle import route, run, request, response, static_file, hook
+from pymemcache.client import Client
 
 DB_HOST = 'localhost'
 DB_PORT = 5652
