@@ -1,10 +1,8 @@
 import json
 from bottle import route, run, request, response, static_file, hook
 from pymemcache.client import Client
-
 import hashlib
 import requests
-import logging
 
 DB_HOST = 'localhost'
 DB_PORT = 5652
@@ -52,13 +50,13 @@ class Dao:
             self.db.set('count', 1)
             return 1
 
-    def set_sushi(self, count, sushi):
-        self.db.set('sushi:'+str(count), sushi)
+    def set_sushi(self, sushi):
+        self.db.set('sushi:'+str(sushi['id']), sushi)
 
 dao = Dao(DB_HOST, DB_PORT)
 
 def transfer_gari(sender, to, value):
-    uri = 'http://'+str(INNER_API_HOST)+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/transfer'
+    uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/transfer'
     response = requests.post(
         uri,
         data=json.dumps(dict({'to': str(to), 'value': int(value)})),
@@ -67,7 +65,7 @@ def transfer_gari(sender, to, value):
 @route('/api/gari')
 def get_gari():
     address = request.query.address
-    uri = 'http://'+str(INNER_API_HOST)+':'+str(INNER_API_PORT)+'/accounts/'+str(address)+'/balance'
+    uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(address)+'/balance'
     response = requests.get(uri)
     balance = response.json()[0]
     return {'balance': balance}
@@ -75,7 +73,7 @@ def get_gari():
 @route('/api/tap', method='POST')
 def tap_gari():
     sender = request.get_header('uniqys-sender')
-    uri = 'http://'+str(INNER_API_HOST)+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/balance'
+    uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/balance'
     response = requests.put(uri, data=json.dumps([10000]), headers={'Content-Type': 'application/json'})
     return 0
 
@@ -102,9 +100,41 @@ def post_sushi():
             'timestamp': request.get_header('uniqys-timestamp'),
             'blockhash': request.get_header('uniqys-blockhash')
     }
-    dao.set_sushi(count, sushi)
+    dao.set_sushi(sushi)
 
     transfer_gari(owner, OPERATOR_ADDRESS, 100)
+
+    return 0
+
+@route('/api/sell', method='POST')
+def sell_sushi():
+    data = request.json
+    sushi = data['sushi']
+    price = data['price']
+
+    new_sushi = sushi
+    new_sushi['status'] = 'sell'
+    new_sushi['price'] = price
+
+    dao.set_sushi(new_sushi)
+
+@route('/api/buy', method='POST')
+def buy_sushi():
+    sender = request.get_header('uniqys-sender')
+
+    data = request.json
+    sushi = data['sushi']
+    seller = sushi['owner']
+    price = int(sushi['price'])
+
+    new_sushi = sushi
+    new_sushi['status'] = 'normal'
+    new_sushi['price'] = 0
+    new_sushi['owner'] = sender
+
+    dao.set_sushi(new_sushi)
+
+    transfer_gari(sender, seller, price)
 
     return 0
 
