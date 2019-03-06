@@ -22,7 +22,6 @@ def post_message():
     sender = request.get_header('uniqys-sender')
     body = request.json
     message = body['message']
-    print('ゴミ')
     db.set('message', message.encode('utf8'))
 
 run(host=APP_HOST, port=APP_PORT)

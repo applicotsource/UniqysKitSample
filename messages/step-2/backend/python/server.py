@@ -30,7 +30,7 @@ class Dao:
 
     def get_count(self):
         count = self.db.get('count')
-        return int(count)
+        return int(count) if count else 0
 
     def get_messages(self, count):
         ids = range(1, count+1)
