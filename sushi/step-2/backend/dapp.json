@@ -8,5 +8,5 @@
     }
   ],
   "initApp": "",
-  "startApp": "echo \"no start command specified\""
+  "startApp": "node js/server.js"
 }
