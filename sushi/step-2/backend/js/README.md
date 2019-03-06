@@ -74,16 +74,12 @@ app.post('/api/generate', async (req, res) => {
     status: 'normal',
     price: 0,
     owner: sender,
-    dna: keccak('keccak256').update(count).digest('hex')
+    dna: keccak('keccak256').update(count.toString()).digest('hex'),
+    timestamp,
+    blockhash
   }
 
-  memcached.set(`sushi:${count}`, {
-    id: count,
-    sender,
-    timestamp,
-    blockhash,
-    sushi: newSushi
-  }, 0, (err) => {
+  memcached.set(`sushi:${count}`, newSushi, 0, (err) => {
     if (err) {
       res.status(400).send(err)
     }
@@ -95,6 +91,102 @@ app.post('/api/generate', async (req, res) => {
 ```
 
 `GET /api/sushiList` を作る
+```
+async function getCount () {
+  return new Promise((resolve, reject) => {
+    memcached.get('count', (err, result) => {
+      if (err) return reject(err)
+      if (typeof result === 'number') return resolve(result)
+      resolve(0)
+    })
+  })
+}
+
+async function getSushiList (count) {
+  return new Promise((resolve, reject) => {
+    if (!count) return resolve([])
+    const ids = new Array(count).fill(0).map((_, i) => i + 1) // XXX: fill(0)いる？
+    memcached.getMulti(ids.map(id => `sushi:${id}`), (err, results) => {
+      if (err) return reject(err)
+      resolve(ids.map(id => results[`sushi:${id}`]))
+    })
+  })
+}
+
+app.get('/api/sushiList', async (_, res) => {
+  const count = await getCount()
+  const sushiList = await getSushiList(count)
+  res.send({ sushiList });
+});
+```
+
+frontendを修正してgenerateとsushiListを叩けるようにする
+```
+cd frontend
+npm install --save @uniqys/easy-client
+```
+
+`frontend/package.json` を修正
+```
+"serve": "vue-cli-service serve --port 3000",
+```
+
+`frontend/vue.config.js` を作成
+CORS対策です
+```
+module.exports = {
+  devServer: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/uniqys": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      }
+    }
+  }
+}
+```
+
+**こっから難しいかも**
+
+`frontend/src/App.vue`
+```
+import { EasyClientForBrowser } from '@uniqys/easy-client'
+```
+
+dataを修正 デフォルトはなにもなし
+```
+client: new EasyClientForBrowser('http://localhost:3000'),
+myAddress: '',
+sushiList: []
+```
+
+アドレスを取得
+```
+async fetchMyAddress() {
+  this.myAddress = this.client.address.toString()
+},
+```
+
+おすしリストを取得
+```
+async fetchSushiList() {
+  const response = await this.client.get('/api/sushiList')
+  const { sushiList } = response.data
+  this.sushiList = sushiList
+},
+```
+
+ページ更新時に取得してくる
+```
+created() {
+  this.fetchMyAddress()
+  this.fetchSushiList()
+},
+```
 
 
 # 他

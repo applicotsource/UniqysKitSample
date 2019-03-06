@@ -47,7 +47,7 @@ async function getSushiList (count) {
   })
 }
 
-app.get('/api/sushi', async (_, res) => {
+app.get('/api/sushiList', async (_, res) => {
   const count = await getCount()
   const sushiList = await getSushiList(count)
   res.send({ sushiList });
@@ -64,16 +64,12 @@ app.post('/api/generate', async (req, res) => {
     status: 'normal',
     price: 0,
     owner: sender,
-    dna: keccak('keccak256').update(count).digest('hex')
+    dna: keccak('keccak256').update(count.toString()).digest('hex'),
+    timestamp,
+    blockhash
   }
 
-  memcached.set(`sushi:${count}`, {
-    id: count,
-    sender,
-    timestamp,
-    blockhash,
-    sushi: newSushi
-  }, 0, (err) => {
+  memcached.set(`sushi:${count}`, newSushi, 0, (err) => {
     if (err) {
       res.status(400).send(err)
     }
