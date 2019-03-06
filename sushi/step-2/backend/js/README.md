@@ -77,7 +77,7 @@ app.post('/api/generate', async (req, res) => {
     dna: keccak('keccak256').update(count).digest('hex')
   }
 
-  memcached.set(`messages:${count}`, {
+  memcached.set(`sushi:${count}`, {
     id: count,
     sender,
     timestamp,
@@ -93,6 +93,9 @@ app.post('/api/generate', async (req, res) => {
   })
 })
 ```
+
+`GET /api/sushiList` を作る
+
 
 # 他
 ## データをけしたい

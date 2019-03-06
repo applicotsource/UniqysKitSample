@@ -26,6 +26,33 @@ async function incrCount () {
   })
 }
 
+async function getCount () {
+  return new Promise((resolve, reject) => {
+    memcached.get('count', (err, result) => {
+      if (err) return reject(err)
+      if (typeof result === 'number') return resolve(result)
+      resolve(0)
+    })
+  })
+}
+
+async function getSushiList (count) {
+  return new Promise((resolve, reject) => {
+    if (!count) return resolve([])
+    const ids = new Array(count).fill(0).map((_, i) => i + 1) // XXX: fill(0)いる？
+    memcached.getMulti(ids.map(id => `sushi:${id}`), (err, results) => {
+      if (err) return reject(err)
+      resolve(ids.map(id => results[`sushi:${id}`]))
+    })
+  })
+}
+
+app.get('/api/sushi', async (_, res) => {
+  const count = await getCount()
+  const sushiList = await getSushiList(count)
+  res.send({ sushiList });
+});
+
 app.post('/api/generate', async (req, res) => {
   const sender = req.header('uniqys-sender')
   const timestamp = req.header('uniqys-timestamp')
@@ -40,7 +67,7 @@ app.post('/api/generate', async (req, res) => {
     dna: keccak('keccak256').update(count).digest('hex')
   }
 
-  memcached.set(`messages:${count}`, {
+  memcached.set(`sushi:${count}`, {
     id: count,
     sender,
     timestamp,
