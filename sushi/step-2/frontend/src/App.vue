@@ -3,6 +3,7 @@
     <div>
       <p>address: {{ myAddress }}</p>
       <p>{{ myGari }} Gari</p>
+      <button @click="tap()">Gariをもらう</button>
       <button @click="generate()">にぎる</button>
     </div>
     <div class="sushi-wrapper">
@@ -36,12 +37,23 @@ export default {
   name: 'app',
   created() {
     this.fetchMyAddress()
+    this.fetchMyGari()
     this.fetchSushiList()
   },
   methods: {
+    async tap() {
+      await this.client.post('/api/tap', {}, { sign: true })
+      this.fetchMyGari()
+    },
     async generate() {
       await this.client.post('/api/generate', {}, { sign: true })
       this.fetchSushiList()
+      this.fetchMyGari()
+    },
+    async fetchMyGari() {
+      const response = await this.client.get('/api/gari', { params: { address: this.myAddress } })
+      const { balance } = response.data
+      this.myGari = balance
     },
     async fetchMyAddress() {
       this.myAddress = this.client.address.toString()
@@ -49,17 +61,18 @@ export default {
     async fetchSushiList() {
       const response = await this.client.get('/api/sushiList')
       const { sushiList } = response.data
+      console.log(sushiList.map(a => a.id))
       this.sushiList = sushiList
     },
-    sell(sushi, price) {
-      sushi.status = 'sell'
-      sushi.price = price
+    async sell(sushi, price) {
+      await this.client.post('/api/sell', { sushi, price }, { sign: true })
+      this.fetchSushiList()
+      this.fetchMyGari()
     },
-    buy(sushi) {
-      this.myGari -= sushi.price
-      sushi.status = 'normal'
-      sushi.price = 0
-      sushi.owner = this.myAddress
+    async buy(sushi) {
+      await this.client.post('/api/buy', { sushi }, { sign: true })
+      this.fetchSushiList()
+      this.fetchMyGari()
     },
     code(sushi) {
       const dna = new Buffer(sushi.dna)

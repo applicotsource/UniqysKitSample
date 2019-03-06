@@ -188,6 +188,162 @@ created() {
 },
 ```
 
+# Gari対応
+## gariを取得できるようにする
+```
+cd backend/js
+npm install --save axios
+``` 
+
+```js
+app.get('/api/gari', async (req, res) => {
+  const { address } = req.query
+  const uri = `http://${INNER_API_HOST}:${INNER_API_PORT}/accounts/${address}/balance`
+  const response = await axios.get(uri)
+  const balance = response.data[0]
+  res.send({ balance })
+})
+```
+
+```js
+created() {
+  this.fetchMyAddress()
+  this.fetchMyGari()
+  this.fetchSushiList()
+},
+
+async fetchMyGari() {
+  const response = await this.client.get('/api/gari', { params: { address: this.myAddress } })
+  const { balance } = response.data
+  this.myGari = balance
+},
+```
+
+## Gariをもらうボタンを作る
+```html
+<button @click="tap()">Gariをもらう</button>
+```
+```js
+async tap() {
+  await this.client.post('/api/tap', {}, { sign: true })
+  this.fetchMyGari()
+},
+```
+
+backend
+```js
+app.post('/api/tap', async (req, res) => {
+  const sender = req.header('uniqys-sender')
+
+  const uri = `http://${INNER_API_HOST}:${INNER_API_PORT}/accounts/${sender}/balance`
+  await axios.put(uri, JSON.stringify([10000]), { headers: { 'Content-Type': 'application/json' } })
+  res.send()
+})
+```
+
+## にぎるときにGariを減らしてみる
+
+frontend
+```js
+async generate() {
+  await this.client.post('/api/generate', {}, { sign: true })
+  this.fetchSushiList()
+  this.fetchMyGari()
+},
+```
+
+backend
+```js
+const OPERATOR_ADDRESS = 'b8e6493bf64cae685095b162c4a4ee0645cde586'
+
+async function transferGari(from, to, gari) {
+  return new Promise(async (resolve) => {
+    const uri = `http://${INNER_API_HOST}:${INNER_API_PORT}/accounts/${from}/transfer`
+    await axios.post(uri, JSON.stringify({ to, value: parseInt(gari) }), { headers: { 'Content-Type': 'application/json' } })
+    resolve()
+  })
+}
+
+app.post('/api/generate', async (req, res) => {
+
+  // ...
+
+  await transferGari(sender, OPERATOR_ADDRESS, 100)
+  res.send()
+})
+```
+
+## 売ってみる
+
+frontend
+```js
+async sell(sushi, price) {
+  await this.client.post('/api/sell', { sushi, price }, { sign: true })
+  this.fetchSushiList()
+  this.fetchMyGari()
+},
+```
+
+backend
+```
+app.post('/api/sell', async (req, res) => {
+  const { sushi, price } = req.body
+
+  const newSushi = Object.assign({}, sushi, {
+    status: 'sell',
+    price: price
+  })
+
+  memcached.set(`sushi:${sushi.id}`, newSushi, 0, (err) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+    else {
+      res.sendStatus(200)
+    }
+  })
+})
+```
+*他の人のおすしも販売できちゃう・・*
+
+## 買ってみる
+
+frontend
+```
+async buy(sushi) {
+  await this.client.post('/api/buy', { sushi }, { sign: true })
+  this.fetchSushiList()
+  this.fetchMyGari()
+},
+```
+
+backend
+```
+app.post('/api/buy', async (req, res) => {
+  const sender = req.header('uniqys-sender')
+  const { sushi } = req.body
+
+  const newSushi = Object.assign({}, sushi, {
+    status: 'normal',
+    owner: sender,
+    price: 0
+  })
+
+  await memcached.set(`sushi:${sushi.id}`, newSushi, 0, (err) => {
+    if (err) {
+      res.status(400).send(err)
+    }
+    else {
+      res.sendStatus(200)
+    }
+  })
+  await transferGari(sender, sushi.owner, sushi.price)
+  res.send()
+})
+```
+*売ってないおすしも、自分のおすしも買えちゃう・・*
+
+
 
 # 他
 ## データをけしたい
