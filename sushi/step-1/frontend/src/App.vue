@@ -1,11 +1,15 @@
 <template>
   <div id="app">
+    <div>
+      <p>address: {{ myAddress }}</p>
+      <p>{{ myGari }} Gari</p>
+    </div>
     <div class="sushi-wrapper">
       <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
-        <p>{{ sushi.status }}</p>
-        <p>{{ sushi.price }}</p>
-        <p>{{ sushi.owner }}</p>
-        <p>{{ sushi.dna }}</p>
+        <p>{{ myAddress === sushi.owner ? '私のおすし' : 'だれかのおすし' }}</p>
+        <p>{{ code(sushi) }}</p>
+        <p v-if="sushi.status === 'sell'">販売中</p>
+        <p v-if="sushi.status === 'sell'">{{ sushi.price }} Gari</p>
       </div>
     </div>
   </div>
@@ -15,8 +19,19 @@
 
 export default {
   name: 'app',
+  methods: {
+    code(sushi) {
+      const dna = new Buffer(sushi.dna)
+      return {
+        dish: dna.readUInt16BE(0) % 10,
+        neta: dna.readUInt16BE(4) % 10,
+        spice: dna.readUInt16BE(8) % 10,
+      }
+    }
+  },
   data() {
     return {
+      myGari: 10000,
       myAddress: '0xhogehoge',
       sushiList: [
         { // 自分の販売中じゃないおすし
