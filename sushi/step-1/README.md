@@ -55,6 +55,9 @@ styleを当ててみる
   display: flex;
 }
 .sushi-box {
+  width: 200px;
+  height: 300px;
+  margin: 8px;
   border: 1px solid black;
 }
 ```
@@ -124,7 +127,7 @@ sell(sushi, price) {
 },
 
 <div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
-  <input type="text" v-model="price[sushi.id]">
+  <input type="text" placeholder="販売額" v-model="price[sushi.id]">
   <button @click="sell(sushi, price[sushi.id])">売る！</button>
 </div>
 ```
@@ -144,4 +147,29 @@ buy(sushi) {
   <button @click="buy(sushi)">買う！</button>
 </div>
 
+```
+
+おすし画像を作ってみる
+いまcode(sushi)してるとこ
+```
+<div class="sushi-image-box">
+  <img :src="`/img/sushi/dish/dish-0${code(sushi).dish}.png`" alt="">
+  <img :src="`/img/sushi/syari/syari.png`" alt="">
+  <img :src="`/img/sushi/neta/neta-0${code(sushi).neta}.png`" alt="">
+  <img :src="`/img/sushi/spice/spice-0${code(sushi).spice}.png`" alt="">
+</div>
+
+.sushi-image-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+.sushi-image-box img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+}
 ```
