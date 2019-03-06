@@ -2,7 +2,7 @@ import json
 from bottle import route, run, request, response, static_file, hook
 from pymemcache.client import Client
 
-import sha3
+import hashlib
 import requests
 import logging
 
@@ -37,7 +37,7 @@ class Dao:
 
     def get_count(self):
         count = self.db.get('count')
-        return int(count.decode('utf-8'))
+        return count if count else 0
 
     def get_sushi_list(self, count):
         ids = range(1, count+1)
@@ -88,7 +88,7 @@ def get_sushi_list():
 @route('/api/generate', method='POST')
 def post_sushi():
     count = dao.incr_count()
-    keccak_hash = sha3.keccak_256()
+    keccak_hash = hashlib.sha3_256()
     keccak_hash.update(str(count).encode('utf-8'))
     owner = request.get_header('uniqys-sender')
     dna = keccak_hash.hexdigest()
@@ -102,7 +102,6 @@ def post_sushi():
             'timestamp': request.get_header('uniqys-timestamp'),
             'blockhash': request.get_header('uniqys-blockhash')
     }
-    logging.warning(sushi)
     dao.set_sushi(count, sushi)
 
     transfer_gari(owner, OPERATOR_ADDRESS, 100)
