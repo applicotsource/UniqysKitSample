@@ -45,8 +45,8 @@ class Dao:
             self.db.set('count', 1)
             return 1
 
-    def set_message(self, count, uniqys_request):
-        self.db.set('messages:'+str(count), uniqys_request)
+    def set_message(self, count, messages):
+        self.db.set('messages:'+str(count), messages)
 
 dao = Dao(DB_HOST, DB_PORT)
 
@@ -62,13 +62,13 @@ def post_message():
     count = dao.incr_count()
     body = request.json
 
-    uniqys_request = {
+    messages = {
             'sender': request.get_header('uniqys-sender'),
             'timestamp': request.get_header('uniqys-timestamp'),
             'blockhash': request.get_header('uniqys-blockhash'),
             'contents': body['message']
     }
 
-    dao.set_message(count, uniqys_request)
+    dao.set_message(count, messages)
 
 run(host=APP_HOST, port=APP_PORT, debug=True, reloader=True)
