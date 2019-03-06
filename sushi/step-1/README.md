@@ -51,6 +51,7 @@ styleを当ててみる
     </div>
 
 .sushi-wrapper {
+  flex-wrap: wrap;
   display: flex;
 }
 .sushi-box {
@@ -102,6 +103,7 @@ myGari: 10000,
 
 generate() {
   const newId = this.sushiList.length + 1
+  this.myGari -= 100
   this.sushiList.unshift({
     id: newId,
     status: 'normal',
@@ -110,6 +112,21 @@ generate() {
     dna: Math.random().toString(36) // ランダムな文字列を生成
   })
 },
+```
+
+おすしを売ってみる（仮）
+```
+price: [],
+
+sell(sushi, price) {
+  sushi.status = 'sell'
+  sushi.price = price
+},
+
+<div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
+  <input type="text" v-model="price[sushi.id]">
+  <button @click="sell(sushi, price[sushi.id])">売る！</button>
+</div>
 ```
 
 

@@ -11,6 +11,10 @@
         <p>{{ code(sushi) }}</p>
         <p v-if="sushi.status === 'sell'">販売中</p>
         <p v-if="sushi.status === 'sell'">{{ sushi.price }} Gari</p>
+        <div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
+          <input type="text" v-model="price[sushi.id]">
+          <button @click="sell(sushi, price[sushi.id])">売る！</button>
+        </div>
       </div>
     </div>
   </div>
@@ -22,6 +26,7 @@ export default {
   methods: {
     generate() {
       const newId = this.sushiList.length + 1
+      this.myGari -= 100
       this.sushiList.unshift({
         id: newId,
         status: 'normal',
@@ -29,6 +34,10 @@ export default {
         owner: this.myAddress,
         dna: Math.random().toString(36) // ランダムな文字列を生成
       })
+    },
+    sell(sushi, price) {
+      sushi.status = 'sell'
+      sushi.price = price
     },
     code(sushi) {
       const dna = new Buffer(sushi.dna)
@@ -43,19 +52,20 @@ export default {
     return {
       myGari: 10000,
       myAddress: '0xhogehoge',
+      price: [],
       sushiList: [
         { // 自分の販売中じゃないおすし
           id: 1,
           status: 'normal',
           price: 0,
-          owner: this.myAddress,
+          owner: '0xhogehoge',
           dna: 'irjiorgoiwegjioergj'
         },
         { // 自分の販売中のおすし
           id: 2,
           status: 'sell',
           price: 0,
-          owner: this.myAddress,
+          owner: '0xhogehoge',
           dna: '0rtihij6i45h4jgioijerf'
         },
         { // 他の人の販売中じゃないおすし
@@ -89,6 +99,7 @@ export default {
 }
 .sushi-wrapper {
   display: flex;
+  flex-wrap: wrap;
 }
 .sushi-box {
   border: 1px solid black;
