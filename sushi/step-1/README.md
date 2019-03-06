@@ -83,3 +83,33 @@ methods: {
   }
 },
 ```
+
+Gariの概念を導入していく
+
+```
+<div>
+  <p>address: {{ myAddress }}</p>
+  <p>{{ myGari }} Gari</p>
+</div>
+
+myGari: 10000,
+
+```
+
+おすしをにぎってみる（仮）
+```
+<button @click="generate()">にぎる</button>
+
+generate() {
+  const newId = this.sushiList.length + 1
+  this.sushiList.unshift({
+    id: newId,
+    status: 'normal',
+    price: 0,
+    owner: this.myAddress,
+    dna: Math.random().toString(36) // ランダムな文字列を生成
+  })
+},
+```
+
+

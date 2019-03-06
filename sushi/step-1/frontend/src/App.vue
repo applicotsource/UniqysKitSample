@@ -3,6 +3,7 @@
     <div>
       <p>address: {{ myAddress }}</p>
       <p>{{ myGari }} Gari</p>
+      <button @click="generate()">にぎる</button>
     </div>
     <div class="sushi-wrapper">
       <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
@@ -16,10 +17,19 @@
 </template>
 
 <script>
-
 export default {
   name: 'app',
   methods: {
+    generate() {
+      const newId = this.sushiList.length + 1
+      this.sushiList.unshift({
+        id: newId,
+        status: 'normal',
+        price: 0,
+        owner: this.myAddress,
+        dna: Math.random().toString(36) // ランダムな文字列を生成
+      })
+    },
     code(sushi) {
       const dna = new Buffer(sushi.dna)
       return {
@@ -38,14 +48,14 @@ export default {
           id: 1,
           status: 'normal',
           price: 0,
-          owner: '0xhogehoge',
+          owner: this.myAddress,
           dna: 'irjiorgoiwegjioergj'
         },
         { // 自分の販売中のおすし
           id: 2,
           status: 'sell',
           price: 0,
-          owner: '0xhogehoge',
+          owner: this.myAddress,
           dna: '0rtihij6i45h4jgioijerf'
         },
         { // 他の人の販売中じゃないおすし
