@@ -15,6 +15,9 @@
           <input type="text" v-model="price[sushi.id]">
           <button @click="sell(sushi, price[sushi.id])">売る！</button>
         </div>
+        <div v-if="myAddress !== sushi.owner && sushi.status === 'sell'">
+          <button @click="buy(sushi)">買う！</button>
+        </div>
       </div>
     </div>
   </div>
@@ -38,6 +41,12 @@ export default {
     sell(sushi, price) {
       sushi.status = 'sell'
       sushi.price = price
+    },
+    buy(sushi) {
+      this.myGari -= sushi.price
+      sushi.status = 'normal'
+      sushi.price = 0
+      sushi.owner = this.myAddress
     },
     code(sushi) {
       const dna = new Buffer(sushi.dna)
@@ -78,7 +87,7 @@ export default {
         { // 他の人の販売中のおすし
           id: 4,
           status: 'sell',
-          price: 0,
+          price: 5000,
           owner: '0xhugahuga',
           dna: 'irjiorgoiwegjioergj'
         },

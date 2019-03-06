@@ -129,4 +129,19 @@ sell(sushi, price) {
 </div>
 ```
 
+おすしを買ってみる（仮）
+```
+price: 5000,
 
+buy(sushi) {
+  this.myGari -= sushi.price
+  sushi.status = 'normal'
+  sushi.price = 0
+  sushi.owner = this.myAddress
+},
+
+<div v-if="myAddress !== sushi.owner && sushi.status === 'sell'">
+  <button @click="buy(sushi)">買う！</button>
+</div>
+
+```
