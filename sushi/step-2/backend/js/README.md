@@ -1,7 +1,23 @@
+backendディレクトリ作る
 ```
 mkdir backend
 mkdir backend/js
-cd backend/js
+```
+
+uniqys initする
+```
+cd backend
+uniqys dev-init
+```
+
+dapp.jsonを編集する
+```
+"startApp": "node js/server.js"
+```
+
+npm init する
+```
+cd js
 npm init
 
 # enter enter enter...
@@ -28,5 +44,15 @@ app.use(bodyParser())
 app.listen(APP_PORT, APP_HOST)
 ```
 
-`POST '/api/sushi'` を作る
+`POST '/api/generate'` を作る
+```
+npm install --save keccak
+```
+
+# 他
+## データをけしたい
+```
+cd backend
+rm -rf .data
+uniqys init ./dapp.json
 ```
