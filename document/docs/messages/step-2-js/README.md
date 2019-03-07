@@ -1,3 +1,4 @@
+# Step 2 for javascript
 # 方針
 先程作成したmessagesアプリに、複数のメッセージを登録できるようにしてみます
 

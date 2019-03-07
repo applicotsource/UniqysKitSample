@@ -1,3 +1,4 @@
+# Step 2 for javascript
 backendディレクトリ作る
 ```
 mkdir backend
