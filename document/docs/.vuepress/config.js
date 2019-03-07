@@ -30,6 +30,7 @@ module.exports = {
           '/sushi/step-2-python/',
         ]
       },
+      '/qa/',
     ]
   }
 }

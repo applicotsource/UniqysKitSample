@@ -1,24 +1,29 @@
 # Step 2 for javascript
-backendディレクトリ作る
-```
+## backendディレクトリ作る
+```bash
+# sushi/
+
 mkdir backend
-mkdir backend/js
 ```
 
-uniqys initする
-```
-cd backend
+## uniqys initする
+```bash
+# sushi/
+
 uniqys dev-init
 ```
 
-dapp.jsonを編集する
-```
-"startApp": "node js/server.js"
+## dapp.jsonを編集する
+#### sushi/dapp.json
+```json
+"startApp": "node backend/server.js"
 ```
 
-npm init する
-```
-cd js
+## npm init する
+```bash 
+# sushi
+
+cd backend
 npm init
 
 # enter enter enter...
@@ -26,8 +31,10 @@ npm init
 npm install --save express body-parser memcached
 ```
 
-`backend/js/server.js` を編集する
-```
+## `backend/server.js` を編集する
+
+### sushi/backend/server.js
+```js
 const express = require("express")
 const bodyParser = require("body-parser")
 const Memcached = require("memcached")
@@ -45,8 +52,9 @@ app.use(bodyParser())
 app.listen(APP_PORT, APP_HOST)
 ```
 
-`POST '/api/generate'` を作る
-```
+## `POST '/api/generate'` を作る
+#### sushi/backend/server.js
+```js
 npm install --save keccak
 
 const keccak = require('keccak')
@@ -90,9 +98,11 @@ app.post('/api/generate', async (req, res) => {
   })
 })
 ```
+`app.use(bodyParser())` と `app.listen(APP_PORT, APP_HOST)` の間に書いてください
 
-`GET /api/sushiList` を作る
-```
+## `GET /api/sushiList` を作る
+#### sushi/backend/server.js
+```js
 async function getCount () {
   return new Promise((resolve, reject) => {
     memcached.get('count', (err, result) => {
@@ -121,20 +131,23 @@ app.get('/api/sushiList', async (_, res) => {
 });
 ```
 
-frontendを修正してgenerateとsushiListを叩けるようにする
-```
-cd frontend
+## frontendを修正してgenerateとsushiListを叩けるようにする
+```bash
+# sushi/frontend
+
 npm install --save @uniqys/easy-client
 ```
 
 `frontend/package.json` を修正
-```
+#### sushi/frontend/package.json
+```json
 "serve": "vue-cli-service serve --port 3000",
 ```
+uniqys nodeのgatewayが8080で、vueのデフォルトポート番号とかぶるので変更します
 
-`frontend/vue.config.js` を作成
-CORS対策です
-```
+## `frontend/vue.config.js` を作成
+#### sushi/frontend/vue.config.js
+```js
 module.exports = {
   devServer: {
     proxy: {
@@ -150,53 +163,64 @@ module.exports = {
   }
 }
 ```
+CORS対策です
 
-**こっから難しいかも**
+ここまでで、実際に動くことが確認できると思います
 
-`frontend/src/App.vue`
-```
+## frontendからgatewayを叩く
+**ここから難しいかも**
+
+#### sushi/frontend/src/App.vue
+```js
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 ```
 
+#### sushi/frontend/src/App.vue
+```js
+{
+  client: new EasyClientForBrowser('http://localhost:3000'),
+  myGari: 0,
+  myAddress: '',
+  sushiList: []
+}
+```
 dataを修正 デフォルトはなにもなし
-```
-client: new EasyClientForBrowser('http://localhost:3000'),
-myGari: 0,
-myAddress: '',
-sushiList: []
-```
 
-アドレスを取得
-```
+#### sushi/frontend/src/App.vue
+```js
 async fetchMyAddress() {
   this.myAddress = this.client.address.toString()
 },
 ```
+アドレスを取得
 
-おすしリストを取得
-```
+#### sushi/frontend/src/App.vue
+```js
 async fetchSushiList() {
   const response = await this.client.get('/api/sushiList')
   const { sushiList } = response.data
   this.sushiList = sushiList
 },
 ```
+おすしリストを取得
 
-ページ更新時に取得してくる
-```
+#### sushi/frontend/src/App.vue
+```js
 created() {
   this.fetchMyAddress()
   this.fetchSushiList()
 },
 ```
+ページ更新時に取得してくる
 
-# Gari対応
 ## gariを取得できるようにする
-```
-cd backend/js
+```bash
+# sushi/backend
+
 npm install --save axios
 ``` 
 
+#### sushi/backend/server.js
 ```js
 app.get('/api/gari', async (req, res) => {
   const { address } = req.query
@@ -207,6 +231,7 @@ app.get('/api/gari', async (req, res) => {
 })
 ```
 
+#### sushi/frontend/src/App.vue
 ```js
 created() {
   this.fetchMyAddress()
@@ -222,9 +247,12 @@ async fetchMyGari() {
 ```
 
 ## Gariをもらうボタンを作る
+#### sushi/frontend/src/App.vue
 ```html
 <button @click="tap()">Gariをもらう</button>
 ```
+
+#### sushi/frontend/src/App.vue
 ```js
 async tap() {
   await this.client.post('/api/tap', {}, { sign: true })
@@ -232,7 +260,7 @@ async tap() {
 },
 ```
 
-backend
+#### sushi/backend/server.js
 ```js
 app.post('/api/tap', async (req, res) => {
   const sender = req.header('uniqys-sender')
@@ -245,7 +273,7 @@ app.post('/api/tap', async (req, res) => {
 
 ## にぎるときにGariを減らしてみる
 
-frontend
+#### sushi/frontend/src/App.vue
 ```js
 async generate() {
   await this.client.post('/api/generate', {}, { sign: true })
@@ -254,7 +282,7 @@ async generate() {
 },
 ```
 
-backend
+#### sushi/backend/server.js
 ```js
 const OPERATOR_ADDRESS = 'b8e6493bf64cae685095b162c4a4ee0645cde586'
 
@@ -277,7 +305,7 @@ app.post('/api/generate', async (req, res) => {
 
 ## 売ってみる
 
-frontend
+#### sushi/frontend/src/App.vue
 ```js
 async sell(sushi, price) {
   await this.client.post('/api/sell', { sushi, price }, { sign: true })
@@ -286,8 +314,8 @@ async sell(sushi, price) {
 },
 ```
 
-backend
-```
+#### sushi/backend/server.js
+```js
 app.post('/api/sell', async (req, res) => {
   const { sushi, price } = req.body
 
@@ -310,8 +338,8 @@ app.post('/api/sell', async (req, res) => {
 
 ## 買ってみる
 
-frontend
-```
+#### sushi/frontend/src/App.vue
+```js
 async buy(sushi) {
   await this.client.post('/api/buy', { sushi }, { sign: true })
   this.fetchSushiList()
@@ -319,7 +347,7 @@ async buy(sushi) {
 },
 ```
 
-backend
+#### sushi/backend/server.js
 ```js
 app.post('/api/buy', async (req, res) => {
   const sender = req.header('uniqys-sender')
@@ -345,25 +373,13 @@ app.post('/api/buy', async (req, res) => {
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
-# 追加課題
+## 完成！
+お疲れ様でした！
+動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+## 追加課題
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう
 - Gariがなくてもにぎったり購入したりができてしまいます。できないようにしてみましょう
 - 他の人のおすしも販売できてしまいます。backendを修正してみましょう
 - 売ってないおすしも、自分のおすしも買えてしまいます。backendを修正してみましょう
 - 一回販売すると、キャンセルすることができません。キャンセルできるようにしてみましょう
-
-# 他
-## データをけしたい
-```sh
-cd backend
-rm -rf .data
-uniqys init ./dapp.json
-```
-
-## Error: dialed to the wrong peer, Ids do not match
-何回か
-```
-Ctrl-c
-uniqys start
-```
-を試してみてください
