@@ -1,3 +1,1 @@
-# hoge
-
-ああああ
+<img width="400" :src="$withBase('/img/UniqysKit-logo.png')" alt="foo">
