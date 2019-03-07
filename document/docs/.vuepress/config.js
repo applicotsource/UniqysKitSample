@@ -2,6 +2,9 @@ module.exports = {
   base: '/UniqysKitSample/',
   title: 'Uniqys Kit Simple Samples',
   dest: '../docs',
+  markdown: {
+    lineNumbers: true
+  },
   themeConfig: {
     nav: [
         { text: 'Uniqys Kit', link: 'https://uniqys.net/ja' },

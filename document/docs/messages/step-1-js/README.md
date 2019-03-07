@@ -1,7 +1,6 @@
 # Step 1 for javascript
-# 環境構築
-## frontend
-```sh
+## frontendの環境構築
+```bash
 mkdir messages
 cd messages
 
@@ -14,26 +13,32 @@ vue create frontend
 # 全部Enterでオッケーです
 ```
 
-### 動かしてみる
-```
+## frontendを動かしてみる
+```bash
+# /messages
+
 cd frontend
 ```
 
 `package.json` を編集して、ポート番号を変更しておきます
+#### /messages/frontend/package.json
 ```js
 "serve": "vue-cli-service serve --port 3000",
 ```
 
 実行します
-```
+```bash
+# /messages/frontend
+
 npm run serve
 ```
 
-ブラウザで `http://localhost:8080/` にアクセスすると、vueの最初のページが表示されるはずです。
+ブラウザで `http://localhost:3000/` にアクセスすると、vueの最初のページが表示されるはずです。
 
-### まっさらなページにしてみる
-`frontend/src/App.vue` をきれいにします
+## まっさらなページにしてみる
+`messages/frontend/src/App.vue` をきれいにします
 
+#### /messages/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
@@ -46,10 +51,11 @@ npm run serve
 
 ブラウザで確認するときれいになっているはずです。
 
-### メッセージ送信用のフォームを設置してみる
+## メッセージ送信用のフォームを設置してみる
 
 inputとbuttonを設置します
 
+#### /messages/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
@@ -59,10 +65,11 @@ inputとbuttonを設置します
 </template>
 ```
 
-### 入力した値が表示されるようにする
+## 入力した値が表示されるようにする
 
 dataの中に変数を定義します
 
+#### /messages/frontend/src/App.vue
 ```js
 // ...
 export default {
@@ -78,6 +85,7 @@ export default {
 
 フォームに入力した値がinput変数に入るようにします。ついでに下にその内容を表示するようにしてみます
 
+#### /messages/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
@@ -90,9 +98,10 @@ export default {
 
 フォームに入力すると、下の文字が変わることが確認できます。
 
-### 結果を表示できるようにする
+## 結果を表示できるようにする
 message変数に結果が入るようにしてみます
 
+#### /messages/frontend/src/App.vue
 ```js
 data() {
   return {
@@ -107,6 +116,7 @@ methods: {
 }
 ```
 
+#### /messages/frontend/src/App.vue
 ```html
 <div id="app">
   <input type="text" v-model="input">
@@ -117,50 +127,56 @@ methods: {
 
 inputに文字を入力して送信を押してみると、messageの内容が書き換わることが確認できます。
 
-## backend
+## backendの環境構築
 https://cdn-images-1.medium.com/max/2600/1*kRWJUnGUh-txwPFZMKkWig.png
 
 まず、uniqysのセットアップをします
 
 uniqys-cliのインストール
-```
+```bash
 npm install -g @uniqys/cli
 ```
 
-```sh
-# messages/
+```bash
+# /messages/
+
 uniqys dev-init
 ls -a # .data dapp.json uniqys.json frontend/ validatorKey.json
 ```
 
 これでuniqysを開発開始できます
 
-<!-- ここjsとpythonで出し分ける -->
+## uniqys nodeを立ち上げてみる
 
 `uniqys start` で一緒にappサーバを立ち上げることができます。その設定を`dapp.json` に書くことができます。
 
+#### /messages/dapp.json
 ```json
-}
   "startApp": "node backend/server.js"
-}
 ```
 
+## appサーバを実装する
 これから、 `backend/server.js` にappサーバを実装していきます
 
-```sh
+まず、backendディレクトリを作り、 `npm init` します
+```bash
+# /messages/
+
 mkdir backend
 cd backend
 npm init
 # enter, enter ...
 ```
 
-expressを使ってWebサーバを実装します
+expressを使ってWebサーバを実装していくので、関連パッケージをインストールします
 
-```sh
-# backend/
+```bash
+# /messages/backend/
+
 npm install --save express body-parser memcached
 ```
 
+#### messages/backend/server.js
 ```js
 const express = require("express")
 const bodyParser = require("body-parser")
@@ -183,9 +199,14 @@ app.get('/hello', async (_, res) => {
 app.listen(APP_PORT, APP_HOST)
 ```
 
+## appサーバの動作確認する
+
 uniqysを立ち上げてみましょう
-```sh
-# /
+
+frontendが動いてる場合は、もう一つのターミナルを起動してください
+
+```bash
+# /messages/
 uniqys start
 ```
 
@@ -193,18 +214,24 @@ uniqys start
 
 Gateway(8080)を経由して、app(5650)を叩いています
 
-早速messageを書き込み/読み込みできるようにしてみます
+## messageを書き込み/読み込みできるようにしてみる
 
 Uniqysでは、ブロックチェーンの情報をmemcachedプロトコルで操作することができます。
 
-server.js
+#### messages/backend/server.js
 ```js
+// ...
+
+app.get('/hello', async (_, res) => {
+  res.send('hello');
+});
+
 async function getMessage () {
   return new Promise((resolve, reject) => {
     memcached.get('message', (err, result) => {
       if (err) return reject(err)
       if (typeof result === 'string') return resolve(result)
-      resolve(0)
+      resolve('')
     })
   })
 }
@@ -229,19 +256,23 @@ app.post('/api/message', async (req, res) => {
     }
   })
 })
+
+app.listen(APP_PORT, APP_HOST)
 ```
 
 `message` というキーで、メッセージを保存できるようにしてみました
 
-# frontendとbackendをつなげる
+## frontendとbackendをつなげる
 
 さきほどfrontendで作成したフォームで、実際にブロックチェーンの情報を操作できるようにしてみます
 
-## frontend
+## frontendの修正
 
 CORS対策のために、proxyを設定します
 
-`frontend/vue.config.js`を作成し、以下のように設定します
+`messages/frontend/vue.config.js`を作成し、以下のように設定します
+
+#### /messages/frontend/vue.config.js
 ```js
 module.exports = {
   devServer: {
@@ -259,21 +290,26 @@ module.exports = {
 };
 ```
 
-フロントエンドからGatewayを叩くとき、easy-clientを利用すると便利です
+開発中は、フロントエンドからGatewayを叩くとき、easy-clientを利用すると便利です
 
-```sh
-# frontend/
+利用していきましょう
+
+```bash
+# /messages/frontend/
+
 npm install --save @uniqys/easy-client
 ```
 
-`frontend/src/App.vue`
+#### /messages/frontend/src/App.vue
 ```js
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 
 
 data() {
   return {
+    // ...
     client: new EasyClientForBrowser('http://localhost:3000'),
+    // ...
   }
 },
 created() {
@@ -294,11 +330,14 @@ methods: {
 }
 ```
 
+## 動作確認する
+
 いちどuniqysのノードを `ctrl-c` で止め、もういちど `uniqys start` してみましょう
+
 frontendを `ctrl-c` で止め、もういちど `npm serve` してみましょう
 
 ブラウザからフォームを送信すると、メッセージをブロックチェーン上に書き込めていることがわかります
 
-シークレットウインド胃で試しに実行してみてください。ブラウザを更新すると書き換わることが確認できます
+シークレットウインドウで試しに実行してみてください。ブラウザを更新すると書き換わることが確認できます
 
 次のステップでは、複数のメッセージが書き込めるように修正してみます
