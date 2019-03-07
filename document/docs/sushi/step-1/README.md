@@ -3,13 +3,17 @@
 frontendディレクトリを作成します
 
 vue-cliがインストールされていない場合はインストールしてください
-```sh
+```bash
+# /
+
 npm install -g @vue/cli # すでに入ってたら不要です
 exec $SHELL -l # 必要あれば
 ```
 
 vueが動くか確認してみます
-```sh
+```bash
+# /
+
 mkdir sushi
 cd sushi
 vue create frontend # ぜんぶEnterでオッケーです
@@ -24,6 +28,7 @@ npm run serve
 ## まっさらなページにしてみる
 `frontend/src/App.vue` をきれいにします
 
+#### sushi/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
@@ -37,6 +42,8 @@ npm run serve
 ブラウザで確認するときれいになっているはずです。
 
 ## 自分のアドレスを作ってみる
+
+#### sushi/frontend/src/App.vue
 ```js
 data() {
   return {
@@ -47,6 +54,8 @@ data() {
 ```
 
 ## おすしのデータを作ってみる
+
+#### sushi/frontend/src/App.vue
 ```js
 data() {
   return {
@@ -86,6 +95,7 @@ data() {
 
 ## おすしの枠を表示してみる
 
+#### sushi/frontend/src/App.vue
 ```html
 <div v-for="sushi in sushiList" :key="sushi.id">
   <p>{{ sushi.status }}</p>
@@ -96,6 +106,7 @@ data() {
 ```
 
 ## styleを当ててみる
+#### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-wrapper">
   <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
@@ -107,6 +118,7 @@ data() {
 </div>
 ```
 
+#### sushi/frontend/src/App.vue
 ```css
 .sushi-wrapper {
   flex-wrap: wrap;
@@ -121,6 +133,7 @@ data() {
 ```
 
 ## 表示を整えてみる
+#### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
   <p>{{ myAddress === sushi.owner ? '私のおすし' : 'だれかのおすし' }}</p>
@@ -131,6 +144,7 @@ data() {
 ```
 
 ## DNAからおすしの表示パターンを計算してみる
+#### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
   <p>{{ myAddress === sushi.owner ? '私のおすし' : 'だれかのおすし' }}</p>
@@ -140,6 +154,7 @@ data() {
 </div>
 ```
 
+#### sushi/frontend/src/App.vue
 ```js
 export default {
   methods: {
@@ -156,14 +171,14 @@ export default {
 ```
 
 ## Gariの概念を導入していく
-
+#### sushi/frontend/src/App.vue
 ```html
 <div>
   <p>address: {{ myAddress }}</p>
   <p>{{ myGari }} Gari</p>
 </div>
 ```
-
+#### sushi/frontend/src/App.vue
 ```js
 data() {
   return {
@@ -173,10 +188,11 @@ data() {
 ```
 
 ## おすしをにぎってみる（仮）
+#### sushi/frontend/src/App.vue
 ```html
 <button @click="generate()">にぎる</button>
 ```
-
+#### sushi/frontend/src/App.vue
 ```js
 generate() {
   const newId = this.sushiList.length + 1
@@ -192,13 +208,14 @@ generate() {
 ```
 
 ## おすしを売ってみる（仮）
+#### sushi/frontend/src/App.vue
 ```html
 <div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
   <input type="text" placeholder="販売額" v-model="price[sushi.id]">
   <button @click="sell(sushi, price[sushi.id])">売る！</button>
 </div>
 ```
-
+#### sushi/frontend/src/App.vue
 ```js
 data() {
   return {
@@ -214,12 +231,14 @@ methods: {
 ```
 
 ## おすしを買ってみる（仮）
+#### sushi/frontend/src/App.vue
 ```html
 <div v-if="myAddress !== sushi.owner && sushi.status === 'sell'">
   <button @click="buy(sushi)">買う！</button>
 </div>
 ```
 
+#### sushi/frontend/src/App.vue
 ```js
 buy(sushi) {
   this.myGari -= sushi.price
@@ -230,7 +249,8 @@ buy(sushi) {
 ```
 
 ## おすし画像を作ってみる
-いまcode(sushi)してるとこ
+いまcode(sushi)してるところを置き換える
+#### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-image-box">
   <img :src="`/img/sushi/dish/dish-0${code(sushi).dish}.png`" alt="">
@@ -240,6 +260,7 @@ buy(sushi) {
 </div>
 ```
 
+#### sushi/frontend/src/App.vue
 ```css
 .sushi-image-box {
   position: relative;
@@ -255,3 +276,7 @@ buy(sushi) {
   height: 100px;
 }
 ```
+
+## モックは完成！
+
+フロントエンドのモックが完成しました。Step 2ではUniqysとつなげていきます！

@@ -1,5 +1,5 @@
 # Step 2 for javascript
-# 方針
+## 方針
 先程作成したmessagesアプリに、複数のメッセージを登録できるようにしてみます
 
 ヒント:
@@ -10,14 +10,11 @@
 
 できそうな人は、やってみてください。いろんなやりかたで実装できると思います
 
-# 作業
-
 *サンプルはエラー処理を省略しているので、気になる人はやってみてください*
 
-## メッセージの数をカウントする
+## 複数のメッセージを書き込めるようにする
 
-まず書き込みから変更していきます
-
+#### messages/backend/server.js
 ```js
 // countを1つ増やしてその結果を返します
 async function incrCount () {
@@ -70,8 +67,10 @@ app.post('/api/message', async (req, res) => {
 }
 ```
 
+## 複数のメッセージを読み込めるようにする
 つぎに、読み込めるようにしてみます
 
+#### messages/backend/server.js
 ```js
 // ブロックチェーンからメッセージの配列を取得します
 async function getMessages (count) {
@@ -104,19 +103,21 @@ app.get('/api/message', async (_, res) => {
 });
 ```
 
-最後に、frontendで取得できるようにしてみます
+## frontendで取得できるようにしてみる
 
-dataのmessagesの構造を変えます
+#### messages/frontend/src/App.vue
 ```js
 data() {
   return {
+    // ...
     messages: []
+    // ...
   }
 },
 ```
+配列を受け取れるように、messagesの構造を変えました
 
-`GET /api/message` が配列で帰ってくるようになったので、 `fetch()` の受け取り方を変えます
-
+#### messages/frontend/src/App.vue
 ```js
 update() {
   this.client.get('/api/message').then((res) => {
@@ -125,8 +126,9 @@ update() {
   });
 },
 ```
+`GET /api/message` が配列で帰ってくるようになったので、 `fetch()` の受け取り方を変えました
 
-templateを変更します
+#### messages/frontend/src/App.vue
 ```html
 <div id="app">
   <input type="text" v-model="input">
@@ -151,6 +153,9 @@ templateを変更します
   </table>
 </div>
 ```
+templateを変更して、tableで表示してみました
+
+## 動作確認
 
 uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` してください
 
@@ -158,9 +163,10 @@ uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` して
 
 シークレットウインドウから、送信してみてください。複数のsenderが確認できると思います
 
-# 追加課題
+## 追加課題
 
-時間が余ってしまった場合は、以下について挑戦してみてください
+暇すぎてしょうがない場合は、以下について挑戦してみてください
+
 順番はないので、楽しそうなものを選んでOKです
 
 - 見た目があまりにも寂しいので、見た目を整えてみましょう
@@ -169,4 +175,5 @@ uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` して
 - 返信できるようにしてみましょう
 - 複数のスレッドで書き込めるようにしてみましょう
 - 名前を設定して表示できるようにしてみましょう
+- **sushi** に挑戦してみましょう
 
