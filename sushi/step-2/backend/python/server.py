@@ -1,8 +1,8 @@
 import json
-from bottle import route, run, request, response, static_file, hook
-from pymemcache.client import Client
 import hashlib
 import requests
+from bottle import route, run, request, response, static_file, hook
+from pymemcache.client import Client
 
 DB_HOST = 'localhost'
 DB_PORT = 5652
@@ -35,7 +35,7 @@ class Dao:
 
     def get_count(self):
         count = self.db.get('count')
-        return count if count else 0
+        return int(count) if count else 0
 
     def get_sushi_list(self, count):
         ids = range(1, count+1)
