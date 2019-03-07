@@ -1,6 +1,7 @@
 module.exports = {
   base: '/UniqysKitSample/',
   title: 'Uniqys Kit Simple Samples',
+  dest: '../docs',
   themeConfig: {
     nav: [
         { text: 'Uniqys Kit', link: 'https://uniqys.net/ja' },
