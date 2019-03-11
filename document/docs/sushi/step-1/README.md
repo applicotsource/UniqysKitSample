@@ -249,7 +249,9 @@ buy(sushi) {
 ```
 
 ## おすし画像を作ってみる
-いまcode(sushi)してるところを置き換える
+おすしの画像は [sushi.zip](https://github.com/nanotumblr/UniqysKitSample/blob/master/sushi/step-1/frontend/public/img/sushi.zip) を利用してください
+
+いまcode(sushi)してるところを置き換えます
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-image-box">
