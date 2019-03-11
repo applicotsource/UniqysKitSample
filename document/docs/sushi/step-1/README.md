@@ -249,6 +249,9 @@ buy(sushi) {
 ```
 
 ## おすし画像を作ってみる
+// FIXME: あとでURL差し替え
+おすしの画像は [sushi.zip]([http://0.0.0.0:8080](https://github.com/nanotumblr/UniqysKitSample/blob/master/sushi/step-1/frontend/public/img/sushi.zip)) を利用してください
+
 いまcode(sushi)してるところを置き換える
 #### sushi/frontend/src/App.vue
 ```html
