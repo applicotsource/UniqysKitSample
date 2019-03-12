@@ -10,12 +10,12 @@
 
 できそうな人は、やってみてください。いろんなやりかたで実装できると思います
 
-# 作業
-
 *サンプルはエラー処理を省略しているので、気になる人はやってみてください*
 
 ## Data Access Object
 pymemcacheの扱いを簡単にするためにData Access Objectクラス(Dao)を定義し、コンストラクタを以下のように決めます。
+
+#### messages/backend/server.py
 ```python
 class Dao:
     def __init__(self, host, port):
@@ -41,9 +41,7 @@ class Dao:
 pymemcacheを利用するメソッドはこのクラスにまとめておくことで、エンコード・デコードの問題を気にしなくてよくなります。詳しくはこちらの記事をご覧ください
 実録！Uniqys KitでのDApps開発記 第3回「CryptOsushiのバックエンド」 by @odan3240 https://link.medium.com/CNCty6tQPU
 
-## メッセージの数をカウントする
-
-まず書き込みから変更していきます
+## 複数のメッセージを書き込めるようにする
 
 ```python
 # countを1つ増やしてその結果を返します
@@ -60,7 +58,7 @@ class Dao:
     def set_message(self, count, messages):
         self.db.set('messages:'+str(count), messages)
 
-# POSTで受け取ったメッセージとブロックチェーン関連の情報を整形して書き込みます
+# POSTで受け取ったメッセージとブロックチェーン関連の情報を整形して書き込むメソッドを呼び出します
 @route('/api/message', method='POST')
 def post_message():
     count = dao.incr_count()
@@ -85,7 +83,7 @@ def post_message():
     'contents': body['message'] # message body
 }
 ```
-
+## 複数のメッセージを読み込めるようにする
 つぎに、読み込めるようにしてみます
 
 ```python
@@ -109,7 +107,7 @@ def get_message():
     return {'messages': messages}
 ```
 
-最後に、frontendで取得できるようにしてみます
+## frontendで取得できるようにしてみる
 
 dataのmessagesの構造を変えます
 ```js
@@ -120,8 +118,9 @@ data() {
 },
 ```
 
-`GET /api/message` が配列で帰ってくるようになったので、 `fetch()` の受け取り方を変えます
+配列を受け取れるように、messagesの構造を変えました
 
+#### messages/frontend/src/App.vue
 ```js
 update() {
   this.client.get('/api/message').then((res) => {
@@ -130,8 +129,9 @@ update() {
   });
 },
 ```
+`GET /api/message` が配列で帰ってくるようになったので、 `fetch()` の受け取り方を変えました
 
-templateを変更します
+#### messages/frontend/src/App.vue
 ```html
 <div id="app">
   <input type="text" v-model="input">
@@ -156,6 +156,9 @@ templateを変更します
   </table>
 </div>
 ```
+templateを変更して、tableで表示してみました
+
+## 動作確認
 
 uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` してください
 
@@ -163,9 +166,10 @@ uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` して
 
 シークレットウインドウから、送信してみてください。複数のsenderが確認できると思います
 
-# 追加課題
+## 追加課題
 
-時間が余ってしまった場合は、以下について挑戦してみてください
+暇すぎてしょうがない場合は、以下について挑戦してみてください
+
 順番はないので、楽しそうなものを選んでOKです
 
 - 見た目があまりにも寂しいので、見た目を整えてみましょう
@@ -174,4 +178,4 @@ uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` して
 - 返信できるようにしてみましょう
 - 複数のスレッドで書き込めるようにしてみましょう
 - 名前を設定して表示できるようにしてみましょう
-
+- **sushi** に挑戦してみましょう
