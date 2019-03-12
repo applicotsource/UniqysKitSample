@@ -23,103 +23,154 @@ npm run serve
 
 ブラウザで `http://localhost:8080/` にアクセスすると、vueの最初のページが表示されるはずです。
 
+<img width="400" :src="$withBase('/img/sushi/step-1/setup-vue.png')" alt="foo">
+
 # おすしのモックを作っていく
 
 ## まっさらなページにしてみる
 `frontend/src/App.vue` をきれいにします
 
+不要なcomponentsとimportも消します
+
 #### sushi/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
-    <p>あああ</p>
+    <p>こんにちは！</p>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'app'
+}
+</script>
+
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
 ```
 
-不要なcomponentsとimportも消します
+`npm run serve` はファイルの変更を監視して自動的に表示を更新してくれます。変更を保存してブラウザで確認すると、きれいになっているはずです。
 
-ブラウザで確認するときれいになっているはずです。
+<img width="400" :src="$withBase('/img/sushi/step-1/clean-vue.png')" alt="foo">
 
 ## 自分のアドレスを作ってみる
 
 #### sushi/frontend/src/App.vue
-```js
-data() {
-  return {
-    myAddress: '0xhogehoge',
+```html
+<template>
+  <div id="app">
+    <p>私のアドレス: {{ myAddress }}</p>
+    <p>こんにちは！</p>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'app',
+  data() {
+    return {
+      myAddress: '0xhogehoge',
+    }
   }
 }
-
+</script>
 ```
+
+<img width="400" :src="$withBase('/img/sushi/step-1/address-vue.png')" alt="foo">
 
 ## おすしのデータを作ってみる
 
 #### sushi/frontend/src/App.vue
-```js
-data() {
-  return {
-    sushiList: [
-      { // 自分の販売中じゃないおすし
-        id: 1,
-        status: 'normal',
-        price: 0,
-        owner: '0xhogehoge',
-        dna: 'irjiorgoiwegjioergj'
-      },
-      { // 自分の販売中のおすし
-        id: 2,
-        status: 'sell',
-        price: 0,
-        owner: '0xhogehoge',
-        dna: '0rtihij6i45h4jgioijerf'
-      },
-      { // 他の人の販売中じゃないおすし
-        id: 3,
-        status: 'normal',
-        price: 0,
-        owner: '0xhugahuga',
-        dna: 'x3igwegjsij5gjj35p4hi45h'
-      },
-      { // 他の人の販売中のおすし
-        id: 4,
-        status: 'sell',
-        price: 5000,
-        owner: '0xhugahuga',
-        dna: 'irjiorgoiwegjioergj'
-      },
-    ]
+```html
+<script>
+export default {
+  name: 'app',
+  data() {
+    return {
+      myAddress: '0xhogehoge',
+      sushiList: [
+        { // 自分の販売中じゃないおすし
+          id: 1,
+          status: 'normal',
+          price: 0,
+          owner: '0xhogehoge',
+          dna: 'irjiorgoiwegjioergj'
+        },
+        { // 自分の販売中のおすし
+          id: 2,
+          status: 'sell',
+          price: 0,
+          owner: '0xhogehoge',
+          dna: '0rtihij6i45h4jgioijerf'
+        },
+        { // 他の人の販売中じゃないおすし
+          id: 3,
+          status: 'normal',
+          price: 0,
+          owner: '0xhugahuga',
+          dna: 'x3igwegjsij5gjj35p4hi45h'
+        },
+        { // 他の人の販売中のおすし
+          id: 4,
+          status: 'sell',
+          price: 5000,
+          owner: '0xhugahuga',
+          dna: 'irjiorgoiwegjioergj'
+        },
+      ]
+    }
   }
 }
+</script>
 ```
 
 ## おすしの枠を表示してみる
 
 #### sushi/frontend/src/App.vue
 ```html
-<div v-for="sushi in sushiList" :key="sushi.id">
-  <p>{{ sushi.status }}</p>
-  <p>{{ sushi.price }}</p>
-  <p>{{ sushi.owner }}</p>
-  <p>{{ sushi.dna }}</p>
-</div>
+<template>
+  <div id="app">
+    <p>私のアドレス: {{ myAddress }}</p>
+    <div class="sushi-wrapper">
+      <div v-for="sushi in sushiList" :key="sushi.id">
+        <p>{{ sushi.status }}</p>
+        <p>{{ sushi.price }}</p>
+        <p>{{ sushi.owner }}</p>
+        <p>{{ sushi.dna }}</p>
+      </div>
+    </div>
+  </div>
+</template>
 ```
+
+<img width="400" :src="$withBase('/img/sushi/step-1/sushi-box.png')" alt="foo">
 
 ## styleを当ててみる
 #### sushi/frontend/src/App.vue
 ```html
-<div class="sushi-wrapper">
-  <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
-    <p>{{ sushi.status }}</p>
-    <p>{{ sushi.price }}</p>
-    <p>{{ sushi.owner }}</p>
-    <p>{{ sushi.dna }}</p>
-  </div>
-</div>
+<div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
 ```
 
 #### sushi/frontend/src/App.vue
-```css
+```html
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
 .sushi-wrapper {
   flex-wrap: wrap;
   display: flex;
@@ -130,7 +181,10 @@ data() {
   margin: 8px;
   border: 1px solid black;
 }
+</style>
 ```
+
+<img width="400" :src="$withBase('/img/sushi/step-1/sushi-style.png')" alt="foo">
 
 ## 表示を整えてみる
 #### sushi/frontend/src/App.vue
@@ -142,6 +196,7 @@ data() {
   <p v-if="sushi.status === 'sell'">{{ sushi.price }} Gari</p>
 </div>
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/display-sushi.png')" alt="foo">
 
 ## DNAからおすしの表示パターンを計算してみる
 #### sushi/frontend/src/App.vue
@@ -169,52 +224,66 @@ export default {
   },
 }
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/sushi-dna.png')" alt="foo">
 
 ## Gariの概念を導入していく
 #### sushi/frontend/src/App.vue
 ```html
-<div>
-  <p>address: {{ myAddress }}</p>
-  <p>{{ myGari }} Gari</p>
-</div>
+<p>私のアドレス: {{ myAddress }}</p>
+<p>{{ myGari }} Gari</p>
 ```
 #### sushi/frontend/src/App.vue
 ```js
 data() {
   return {
+    // ...
     myGari: 10000,
+    // ...
   }
 }
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/gari.png')" alt="foo">
 
 ## おすしをにぎってみる（仮）
 #### sushi/frontend/src/App.vue
 ```html
+<p>{{ myGari }} Gari</p>
 <button @click="generate()">にぎる</button>
 ```
+
 #### sushi/frontend/src/App.vue
 ```js
-generate() {
-  const newId = this.sushiList.length + 1
-  this.myGari -= 100
-  this.sushiList.unshift({
-    id: newId,
-    status: 'normal',
-    price: 0,
-    owner: this.myAddress,
-    dna: Math.random().toString(36) // ランダムな文字列を生成
-  })
-},
+methods: {
+  generate() {
+    const newId = this.sushiList.length + 1
+    this.myGari -= 100
+    this.sushiList.unshift({
+      id: newId,
+      status: 'normal',
+      price: 0,
+      owner: this.myAddress,
+      dna: Math.random().toString(36) // ランダムな文字列を生成
+    })
+  },
+}
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/generate.png')" alt="foo">
 
 ## おすしを売ってみる（仮）
 #### sushi/frontend/src/App.vue
 ```html
-<div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
-  <input type="text" placeholder="販売額" v-model="price[sushi.id]">
-  <button @click="sell(sushi, price[sushi.id])">売る！</button>
+<div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
+  <p>{{ myAddress === sushi.owner ? '私のおすし' : 'だれかのおすし' }}</p>
+  <p>{{ code(sushi) }}</p>
+  <p v-if="sushi.status === 'sell'">販売中</p>
+  <p v-if="sushi.status === 'sell'">{{ sushi.price }} Gari</p>
+  <div v-if="myAddress === sushi.owner && sushi.status === 'normal'">
+    <input type="text" placeholder="販売額" v-model="price[sushi.id]">
+    <button @click="sell(sushi, price[sushi.id])">売る！</button>
+  </div>
 </div>
 ```
+
 #### sushi/frontend/src/App.vue
 ```js
 data() {
@@ -229,6 +298,7 @@ methods: {
   },
 }
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/sell.png')" alt="foo">
 
 ## おすしを買ってみる（仮）
 #### sushi/frontend/src/App.vue
@@ -240,16 +310,23 @@ methods: {
 
 #### sushi/frontend/src/App.vue
 ```js
-buy(sushi) {
-  this.myGari -= sushi.price
-  sushi.status = 'normal'
-  sushi.price = 0
-  sushi.owner = this.myAddress
-},
+methods: {
+  buy(sushi) {
+    this.myGari -= sushi.price
+    sushi.status = 'normal'
+    sushi.price = 0
+    sushi.owner = this.myAddress
+  },
+}
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/buy.png')" alt="foo">
 
 ## おすし画像を作ってみる
 おすしの画像は [sushi.zip](https://github.com/nanotumblr/UniqysKitSample/blob/master/sushi/step-1/frontend/public/img/sushi.zip) を利用してください
+
+`sushi/frontend/public/img/sushi/` 以下に配置してください
+
+画像が読み込まれなかったりした場合は、`npm run serve` をCtrl-Cで止め、もう一度実行してみてください
 
 いまcode(sushi)してるところを置き換えます
 #### sushi/frontend/src/App.vue
@@ -278,6 +355,7 @@ buy(sushi) {
   height: 100px;
 }
 ```
+<img width="400" :src="$withBase('/img/sushi/step-1/sushi-image.png')" alt="foo">
 
 ## モックは完成！
 
