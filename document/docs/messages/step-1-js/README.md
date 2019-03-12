@@ -23,7 +23,11 @@ cd frontend
 `package.json` を編集して、ポート番号を変更しておきます
 #### /messages/frontend/package.json
 ```js
-"serve": "vue-cli-service serve --port 3000",
+"scripts": {
+  "serve": "vue-cli-service serve --port 3000",
+  "build": "vue-cli-service build",
+  "lint": "vue-cli-service lint"
+},
 ```
 
 実行します
@@ -42,7 +46,7 @@ npm run serve
 ```html
 <template>
   <div id="app">
-    <p>あああ</p>
+    <p>こんにちは！</p>
   </div>
 </template>
 ```
@@ -71,16 +75,16 @@ dataの中に変数を定義します
 
 #### /messages/frontend/src/App.vue
 ```js
-// ...
+<script>
 export default {
   name: 'app',
   data() {
     return {
       input: ''
     }
-  },
-  // ...
+  }
 }
+</script>
 ```
 
 フォームに入力した値がinput変数に入るようにします。ついでに下にその内容を表示するようにしてみます
@@ -206,6 +210,8 @@ uniqysを立ち上げてみましょう
 frontendが動いてる場合は、もう一つのターミナルを起動してください
 
 ```bash
+# /messages/backend
+cd ../
 # /messages/
 uniqys start
 ```
@@ -221,10 +227,6 @@ Uniqysでは、ブロックチェーンの情報をmemcachedプロトコルで�
 #### messages/backend/server.js
 ```js
 // ...
-
-app.get('/hello', async (_, res) => {
-  res.send('hello');
-});
 
 async function getMessage () {
   return new Promise((resolve, reject) => {

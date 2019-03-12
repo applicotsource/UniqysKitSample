@@ -119,7 +119,7 @@ data() {
 
 #### messages/frontend/src/App.vue
 ```js
-update() {
+fetch() {
   this.client.get('/api/message').then((res) => {
     const messages = res.data.messages;
     this.messages = messages

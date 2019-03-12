@@ -35,6 +35,8 @@ npm run serve
 
 ブラウザで `http://localhost:8080/` にアクセスすると、vueの最初のページが表示されるはずです。
 
+<img :src="$withBase('/img/messages/app1.png')" alt="Vue.js default">
+
 ### まっさらなページにしてみる
 `frontend/src/App.vue` をきれいにします
 
