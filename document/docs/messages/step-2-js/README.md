@@ -161,6 +161,8 @@ uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` して
 
 ブラウザから確認すると、複数のメッセージが送信できるようになっているはずです
 
+<img :src="$withBase('/img/messages/mes9.png')" alt="many messages">
+
 シークレットウインドウから、送信してみてください。複数のsenderが確認できると思います
 
 ## 追加課題

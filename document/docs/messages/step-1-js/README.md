@@ -39,6 +39,8 @@ npm run serve
 
 ブラウザで `http://localhost:3000/` にアクセスすると、vueの最初のページが表示されるはずです。
 
+<img :src="$withBase('/img/messages/mes1.png')" alt="Vue default">
+
 ## まっさらなページにしてみる
 `messages/frontend/src/App.vue` をきれいにします
 
@@ -54,6 +56,7 @@ npm run serve
 不要なcomponentsとimportも消します
 
 ブラウザで確認するときれいになっているはずです。
+<img :src="$withBase('/img/messages/mes2.png')" alt="Hello!">
 
 ## メッセージ送信用のフォームを設置してみる
 
@@ -68,6 +71,8 @@ inputとbuttonを設置します
   </div>
 </template>
 ```
+
+<img :src="$withBase('/img/messages/mes3.png')" alt="set input box & button">
 
 ## 入力した値が表示されるようにする
 
@@ -102,6 +107,8 @@ export default {
 
 フォームに入力すると、下の文字が変わることが確認できます。
 
+<img :src="$withBase('/img/messages/mes4.png')" alt="data binding">
+
 ## 結果を表示できるようにする
 message変数に結果が入るようにしてみます
 
@@ -131,8 +138,12 @@ methods: {
 
 inputに文字を入力して送信を押してみると、messageの内容が書き換わることが確認できます。
 
+<img :src="$withBase('/img/messages/mes5.png')" alt="before submit">
+[送信]をクリックすると
+<img :src="$withBase('/img/messages/mes6.png')" alt="after submit">
+
 ## backendの環境構築
-https://cdn-images-1.medium.com/max/2600/1*kRWJUnGUh-txwPFZMKkWig.png
+<img :src="$withBase('/img/Uniqys.png')" alt="after submit">
 
 まず、uniqysのセットアップをします
 
@@ -340,6 +351,10 @@ frontendを `ctrl-c` で止め、もういちど `npm serve` してみましょ�
 
 ブラウザからフォームを送信すると、メッセージをブロックチェーン上に書き込めていることがわかります
 
+<img :src="$withBase('/img/messages/mes7.png')" alt="post message">
+
 シークレットウインドウで試しに実行してみてください。ブラウザを更新すると書き換わることが確認できます
+
+<img :src="$withBase('/img/messages/mes8.png')" alt="display posted message">
 
 次のステップでは、複数のメッセージが書き込めるように修正してみます
