@@ -17,7 +17,7 @@ uniqys dev-init
 #### sushi/dapp.json
 実行されるappのコマンドを変更する
 ```json
-"startApp": "node backend/server.js"
+"startApp": "python backend/server.py"
 ```
 
 p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
