@@ -1,29 +1,58 @@
 # Step 2 for python
-backendディレクトリ作る
-```sh
+## backendディレクトリ作る
+```bash
+# sushi/
 mkdir backend
 mkdir backend/python
 ```
 
-uniqys initする
-```sh
+## uniqys initする
+```bash
+# sushi/
 cd backend
 uniqys dev-init
 ```
 
-dapp.jsonを編集する
-```
-"startApp": "python python/server.py"
+## dapp.jsonを編集する
+#### sushi/dapp.json
+実行されるappのコマンドを変更する
+```json
+"startApp": "python backend/server.py"
 ```
 
-npm init する
+p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
+```json
+"network": {
+  "port": 5665,
+  "address": "0.0.0.0",
+  "libp2pConfig": {
+    "peerDiscovery": {
+      "mdns": {
+        "interval": 1000,
+        "broadcast": true,
+        "serviceTag": "uniqys.local",
+        "enabled": false
+      },
+      "bootstrap": {
+        "interval": 5000,
+        "list": [],
+        "enabled": false
+      }
+    }
+  }
+}
+```
+
+## 必要なpythonライブラリをインストールする
 ```sh
 cd python
 pip install bottle pymemcache requests
 ```
 
-`backend/python/server.py` を編集する
-pymemcacheに関わる部分はmessageと同様にDaoクラスの中で扱う
+## `backend/python/server.py` を編集する
+memcacheに関わる部分はmessagesと同様にDaoクラスの中で扱う
+
+#### sushi/backend/server.py
 ```python
 import json
 import hashlib
@@ -61,7 +90,8 @@ class Dao:
         raise Exception('Unknown serialization format')
 ```
 
-`POST '/api/generate'` を作る
+## `POST '/api/generate'` を作る
+#### sushi/backend/server.py
 ```python
 class Dao:
     def incr_count(self):
@@ -71,6 +101,8 @@ class Dao:
         else:
             self.db.set('count', 1)
             return 1
+
+dao = Dao(DB_HOST, DB_PORT)
 
 @route('/api/generate', method='POST')
 def post_sushi():
@@ -94,10 +126,14 @@ def post_sushi():
     transfer_gari(owner, OPERATOR_ADDRESS, 100)
 
     return 0
+
+run(host=APP_HOST, port=APP_PORT, debug=True, reloader=True)
 ```
 
-`GET /api/sushiList` を作る
+## `GET /api/sushiList` を作る
+#### sushi/backend/server.py
 ```python
+class Dao:
     def get_count(self):
         count = self.db.get('count')
         return int(count) if count else 0
@@ -114,19 +150,22 @@ def get_sushi_list():
     return {'sushiList': sushi_list}
 ```
 
-frontendを修正してgenerateとsushiListを叩けるようにする
-```sh
-cd frontend
+## frontendを修正してgenerateとsushiListを叩けるようにする
+```bash
+# sushi/frontend
+
 npm install --save @uniqys/easy-client
 ```
 
 `frontend/package.json` を修正
-```
+#### sushi/frontend/package.json
+```json
 "serve": "vue-cli-service serve --port 3000",
 ```
+uniqys nodeのgatewayが8080で、vueのデフォルトポート番号とかぶるので変更します
 
-`frontend/vue.config.js` を作成
-CORS対策です
+## `frontend/vue.config.js` を作成
+#### sushi/frontend/vue.config.js
 ```js
 module.exports = {
   devServer: {
@@ -143,53 +182,59 @@ module.exports = {
   }
 }
 ```
+CORS対策です
 
+ここまでで、実際に動くことが確認できると思います
+
+## frontendからgatewayを叩く
 **こっから難しいかも**
 
-`frontend/src/App.vue`
-```
+#### sushi/frontend/src/App.vue
+```js
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 ```
 
+#### sushi/frontend/src/App.vue
+```js
+{
+  client: new EasyClientForBrowser('http://localhost:3000'),
+  myGari: 0,
+  myAddress: '',
+  sushiList: []
+}
+```
 dataを修正 デフォルトはなにもなし
-```
-client: new EasyClientForBrowser('http://localhost:3000'),
-myGari: 0,
-myAddress: '',
-sushiList: []
-```
 
-アドレスを取得
-```
+#### sushi/frontend/src/App.vue
+```js
 async fetchMyAddress() {
   this.myAddress = this.client.address.toString()
 },
 ```
+アドレスを取得
 
-おすしリストを取得
-```
+#### sushi/frontend/src/App.vue
+```js
 async fetchSushiList() {
   const response = await this.client.get('/api/sushiList')
   const { sushiList } = response.data
   this.sushiList = sushiList
 },
 ```
+おすしリストを取得
 
-ページ更新時に取得してくる
-```
+#### sushi/frontend/src/App.vue
+```js
 created() {
   this.fetchMyAddress()
   this.fetchSushiList()
 },
 ```
+ページ更新時に取得してくる
 
-# Gari対応
 ## gariを取得できるようにする
-```sh
-cd backend/js
-npm install --save axios
-``` 
 
+#### sushi/backend/server.py
 ```python
 @route('/api/gari')
 def get_gari():
@@ -200,6 +245,7 @@ def get_gari():
     return {'balance': balance}
 ```
 
+#### sushi/frontend/src/App.vue
 ```js
 created() {
   this.fetchMyAddress()
@@ -215,9 +261,12 @@ async fetchMyGari() {
 ```
 
 ## Gariをもらうボタンを作る
+#### sushi/frontend/src/App.vue
 ```html
 <button @click="tap()">Gariをもらう</button>
 ```
+
+#### sushi/frontend/src/App.vue
 ```js
 async tap() {
   await this.client.post('/api/tap', {}, { sign: true })
@@ -225,7 +274,7 @@ async tap() {
 },
 ```
 
-backend
+#### sushi/backend/server.py
 ```python
 @route('/api/tap', method='POST')
 def tap_gari():
@@ -237,7 +286,7 @@ def tap_gari():
 
 ## にぎるときにGariを減らしてみる
 
-frontend
+#### sushi/frontend/src/App.vue
 ```js
 async generate() {
   await this.client.post('/api/generate', {}, { sign: true })
@@ -246,7 +295,7 @@ async generate() {
 },
 ```
 
-backend
+#### sushi/backend/server.py
 ```python
 def transfer_gari(sender, to, value):
     uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/transfer'
@@ -267,7 +316,7 @@ def post_sushi():
 
 ## 売ってみる
 
-frontend
+#### sushi/frontend/src/App.vue
 ```js
 async sell(sushi, price) {
   await this.client.post('/api/sell', { sushi, price }, { sign: true })
@@ -276,7 +325,7 @@ async sell(sushi, price) {
 },
 ```
 
-backend
+#### sushi/backend/server.py
 ```python
 @route('/api/sell', method='POST')
 def sell_sushi():
@@ -294,8 +343,8 @@ def sell_sushi():
 
 ## 買ってみる
 
-frontend
-```
+#### sushi/frontend/src/App.vue
+```js
 async buy(sushi) {
   await this.client.post('/api/buy', { sushi }, { sign: true })
   this.fetchSushiList()
@@ -303,7 +352,7 @@ async buy(sushi) {
 },
 ```
 
-backend
+#### sushi/backend/server.py
 ```python
 @route('/api/buy', method='POST')
 def buy_sushi():
@@ -327,25 +376,13 @@ def buy_sushi():
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
-# 追加課題
+## 完成！
+お疲れ様でした！
+動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+## 追加課題
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう
 - Gariがなくてもにぎったり購入したりができてしまいます。できないようにしてみましょう
 - 他の人のおすしも販売できてしまいます。backendを修正してみましょう
 - 売ってないおすしも、自分のおすしも買えてしまいます。backendを修正してみましょう
 - 一回販売すると、キャンセルすることができません。キャンセルできるようにしてみましょう
-
-# 他
-## データをけしたい
-```sh
-cd backend
-rm -rf .data
-uniqys init ./dapp.json
-```
-
-## Error: dialed to the wrong peer, Ids do not match
-何回か
-```
-Ctrl-c
-uniqys start
-```
-を試してみてください

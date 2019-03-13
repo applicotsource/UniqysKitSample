@@ -119,7 +119,7 @@ data() {
 
 #### messages/frontend/src/App.vue
 ```js
-update() {
+fetch() {
   this.client.get('/api/message').then((res) => {
     const messages = res.data.messages;
     this.messages = messages
@@ -160,6 +160,8 @@ templateを変更して、tableで表示してみました
 uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` してください
 
 ブラウザから確認すると、複数のメッセージが送信できるようになっているはずです
+
+<img :src="$withBase('/img/messages/mes9.png')" alt="many messages">
 
 シークレットウインドウから、送信してみてください。複数のsenderが確認できると思います
 
