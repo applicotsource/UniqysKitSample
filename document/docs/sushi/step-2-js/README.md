@@ -15,8 +15,32 @@ uniqys dev-init
 
 ## dapp.jsonを編集する
 #### sushi/dapp.json
+実行されるappのコマンドを変更する
 ```json
 "startApp": "node backend/server.js"
+```
+
+p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
+```json
+"network": {
+  "port": 5665,
+  "address": "0.0.0.0",
+  "libp2pConfig": {
+    "peerDiscovery": {
+      "mdns": {
+        "interval": 1000,
+        "broadcast": true,
+        "serviceTag": "uniqys.local",
+        "enabled": false
+      },
+      "bootstrap": {
+        "interval": 5000,
+        "list": [],
+        "enabled": false
+      }
+    }
+  }
+}
 ```
 
 ## npm init する
